@@ -26,3 +26,4 @@ Now, here's how the persistence architecture works:
 The message store is a table in SQLite with columns: session_id, message content, and metadata
 
 The flow is: new conversation → generate session ID → messages saved automatically per turn → on return, load by session ID.
+
