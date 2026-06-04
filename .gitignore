@@ -111,6 +111,7 @@ venv.bak/
 .models/
 module-3: Information Retrieval with Vector Databases/ungraded_lab_1/.models/
 module-3: Information Retrieval with Vector Databases/ungraded_lab_2/.models/
+module-8\ -\ RAG/data/
 
 # Ignore all virtual environments (if not already)
 .venv/
