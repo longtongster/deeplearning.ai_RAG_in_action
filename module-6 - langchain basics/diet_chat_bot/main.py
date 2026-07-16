@@ -1,10 +1,11 @@
 from logic import DietChatBot
-from ui import PersistentChatBotUI
+from ui import ChatBotUI
 
 # Initialize the chatbot
 diet_chatbot = DietChatBot()
 
-# Create and launch the UI with persistence
-chatbot_ui = PersistentChatBotUI(diet_chatbot)
+# Create and launch the UI
+chatbot_ui = ChatBotUI(diet_chatbot)
 interface = chatbot_ui.create_ui()
+
 interface.launch()

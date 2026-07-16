@@ -4,7 +4,7 @@ from langchain.chat_models import init_chat_model
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage, BaseMessage
 from langchain_community.chat_message_histories import SQLChatMessageHistory
 from dotenv import load_dotenv
-from typing import List, Optional, Generator
+from typing import List, Optional
 
 # Load environment variables
 load_dotenv()
@@ -14,15 +14,18 @@ DEFAULT_MODEL = "gpt-4o-mini"
 DB_CONNECTION_STRING = "sqlite:///conversations.db"
 
 
+SYSTEM_MESSAGE = (
+    "You are a diet planning assistant. Help users create balanced meal plans "
+    "based on their goals, dietary needs, and preferences. Ask about one topic "
+    "at a time to avoid overwhelming the user."
+)
+
+
 class DietChatBot:
     def __init__(self, session_id: Optional[str] = None):
         """Initialize the Diet Chatbot."""
-        # Read the prompt from file
-        with open("prompt.md", "r") as f:
-            system_message = f.read()
-
         self.model = init_chat_model(model=DEFAULT_MODEL, temperature=0)
-        self.system_msg = SystemMessage(content=system_message)
+        self.system_msg = SystemMessage(content=SYSTEM_MESSAGE)
 
         self._initialize_session(session_id)
         self._initialize_history()
@@ -44,25 +47,22 @@ class DietChatBot:
         if not self.history.get_messages():
             self.history.add_message(self.system_msg)
 
-    # main new code for streaming
-    def stream_response(self, user_message: str) -> Generator[str, None, None]:
-        """Stream AI response chunks for a user message."""
+    def get_response(self, user_message: str) -> str:
+        """Process user message and get AI response."""
         # Check if message is empty
         if not (user_message := user_message.strip()):
-            return
+            return ""
 
         # Add user message to history
         self.history.add_message(HumanMessage(content=user_message))
 
-        # Stream response
-        response_content = ""
-        for chunk in self.model.stream(self.history.get_messages()):
-            if chunk.text:
-                response_content += chunk.text
-                yield chunk.text
+        # Get response
+        response = self.model.invoke(self.history.get_messages())
 
-        # Add final response to history
-        self.history.add_message(AIMessage(content=response_content))
+        # Add AI response to history
+        self.history.add_message(AIMessage(content=response.text))
+
+        return response.text
 
     def new_session(self) -> None:
         """Create a new conversation."""
@@ -98,4 +98,3 @@ class DietChatBot:
             cursor = conn.cursor()
         cursor.execute(query)
         return [row[0] for row in cursor.fetchall()]
-
