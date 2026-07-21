@@ -8,30 +8,24 @@ class PersistentChatBotUI:
         """Initialize the UI with a chatbot instance."""
         self.diet_chatbot = diet_chatbot
 
-    # important change to handle streaming
-    def stream_message_handler(
+    def send_message_handler(
         self, user_message: str, history: list
-    ):#-> Generator[Tuple[str, list], None, None]:
-        """Send message to chatbot and stream the response."""
-        # Check if message is empty
-        if not (user_message := user_message.strip()):
-            yield "", history
-            return
+    ) -> Tuple[str, list]:
+        """Send message to chatbot and get response."""
+        # Trim the user message from whitespace
+        user_message = user_message.strip()
 
-        # Add user message to UI history
-        history.append(gr.ChatMessage(content=user_message, role="user"))
-        history.append(gr.ChatMessage(content="", role="assistant"))
+        # If the user message is not empty, get the response from the chatbot
+        if user_message:
+            # Get response
+            ai_response = self.diet_chatbot.get_response(user_message)
 
-        # Yield user message and empty assistant message
-        yield "", history
+            # Add user message and AI response to chatbot history
+            history.append(gr.ChatMessage(content=user_message, role="user"))
+            history.append(gr.ChatMessage(content=ai_response, role="assistant"))
 
-        # Stream response
-        full_response = ""
-        # important change to handle streaming
-        for chunk in self.diet_chatbot.stream_response(user_message):
-            full_response += chunk
-            history[-1] = gr.ChatMessage(content=full_response, role="assistant")
-            yield "", history
+        # Return the user message as empty string and the updated chatbot history
+        return "", history
 
     def new_session_handler(self) -> Tuple[list, Any]:
         """Create a new conversation and update UI."""
@@ -44,10 +38,9 @@ class PersistentChatBotUI:
             return [], self.update_session_choices()
 
         self.diet_chatbot.load_session(session_id)
-        return (
-            self._format_messages_for_ui(self.diet_chatbot.get_messages()),
-            self.update_session_choices(),
-        )
+        return self._format_messages_for_ui(
+            self.diet_chatbot.get_messages()
+        ), self.update_session_choices()
 
     def _format_messages_for_ui(self, messages: List[BaseMessage]) -> list:
         """Format messages from LangChain format to Gradio UI format."""
@@ -79,7 +72,7 @@ class PersistentChatBotUI:
                 "I can help you create balanced meal plans. Your conversations are saved!"
             )
 
-            chatbot = gr.Chatbot(max_height=400) #type="messages")
+            chatbot = gr.Chatbot(height=600) #type="messages")
 
             with gr.Row():
                 with gr.Column(scale=3):
@@ -101,8 +94,9 @@ class PersistentChatBotUI:
                 new = gr.Button("🆕 New Chat", size="sm")
 
             # Event handlers
-            submit.click(self.stream_message_handler, [msg, chatbot], [msg, chatbot])
-            msg.submit(self.stream_message_handler, [msg, chatbot], [msg, chatbot])
+            # NOTE: the logic can be triggerd by the submit button OR the message button
+            submit.click(self.send_message_handler, [msg, chatbot], [msg, chatbot])
+            msg.submit(self.send_message_handler, [msg, chatbot], [msg, chatbot])
             new.click(self.new_session_handler, None, [chatbot, sessions])
             sessions.change(self.load_session_handler, sessions, [chatbot, sessions])
 
@@ -110,4 +104,3 @@ class PersistentChatBotUI:
             interface.load(self.update_session_choices, None, sessions)
 
         return interface
-
