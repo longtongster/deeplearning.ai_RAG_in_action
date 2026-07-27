@@ -7,6 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "adjusttext>=1.3.0",
     "bm25s>=0.3.4",
+    "ddgs>=9.14.4",
     "devtools>=0.12.2",
     "dlai-grader>=2.3.0",
     "dotenv>=0.9.9",
