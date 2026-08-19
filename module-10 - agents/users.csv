@@ -1,0 +1,8 @@
+user_id,tier,total_spent,previous_bookings
+user_001,Gold,2400,8
+user_002,Silver,890,3
+user_003,Bronze,200,1
+user_004,Bronze,3200,12
+user_005,Silver,1500,6
+user_006,Gold,1800,5
+user_007,Silver,600,2

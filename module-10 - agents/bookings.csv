@@ -1,0 +1,9 @@
+booking_id,user_id,hotel_id,hotel,check_in,check_out,room_type,amount_paid_per_night,total_amount
+BK-12345,user_001,HTL-001,Grand Plaza Hotel,2024-07-01,2024-07-05,Standard,140,560
+BK-67890,user_002,HTL-002,City Center Inn,2024-07-15,2024-07-18,Deluxe,150,450
+BK-11111,user_002,HTL-003,Beach Resort,2024-08-01,2024-08-05,Standard,120,480
+BK-33333,user_003,HTL-001,Grand Plaza Hotel,2024-08-02,2024-08-05,Standard,140,420
+BK-44444,user_004,HTL-002,City Center Inn,2024-08-02,2024-08-06,Deluxe,180,720
+BK-55555,user_005,HTL-003,Beach Resort,2024-08-08,2024-08-11,Standard,140,420
+BK-66666,user_006,HTL-001,Grand Plaza Hotel,2024-08-01,2024-08-05,Standard,140,560
+BK-77777,user_007,HTL-002,City Center Inn,2024-08-10,2024-08-13,Standard,130,390
